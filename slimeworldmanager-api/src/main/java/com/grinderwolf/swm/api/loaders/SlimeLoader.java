@@ -91,6 +91,7 @@ public interface SlimeLoader {
      * @param newWorldName new name of the world
      *
      * @throws UnknownWorldException if the world could not be found.
+     * @throws IOException           if the world could not be renamed.
      */
-    boolean renameWorld(String oldWorldName, String newWorldName) throws UnknownWorldException;
+    boolean renameWorld(String oldWorldName, String newWorldName) throws UnknownWorldException, IOException;
 }

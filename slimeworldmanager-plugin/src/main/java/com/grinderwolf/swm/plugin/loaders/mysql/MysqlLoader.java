@@ -49,6 +49,7 @@ public class MysqlLoader extends UpdatableLoader {
     private static final String UPDATE_LOCK_QUERY = "UPDATE `worlds` SET `locked` = ? WHERE `name` = ?;";
     private static final String DELETE_WORLD_QUERY = "DELETE FROM `worlds` WHERE `name` = ?;";
     private static final String LIST_WORLDS_QUERY = "SELECT `name` FROM `worlds`;";
+    private static final String RENAME_WORLD_QUERY = "UPDATE `worlds` SET `name` = ? WHERE `name` = ?;";
 
     private final Map<String, ScheduledFuture> lockedWorlds = new HashMap<>();
     private final HikariDataSource source;
@@ -291,7 +292,23 @@ public class MysqlLoader extends UpdatableLoader {
     }
 
     @Override
-    public boolean renameWorld(String oldWorldName, String newWorldName) {
-        return true;
+    public boolean renameWorld(String oldWorldName, String newWorldName) throws IOException, UnknownWorldException {
+        if(this.lockedWorlds.containsKey(oldWorldName)) {
+            return false;
+        }
+
+        try(Connection con = this.source.getConnection(); PreparedStatement statement = con.prepareStatement(RENAME_WORLD_QUERY)) {
+
+            statement.setString(1, newWorldName);
+            statement.setString(2, oldWorldName);
+
+            if(statement.executeUpdate() == 0) {
+                throw new UnknownWorldException(oldWorldName);
+            }
+
+            return true;
+        }catch(SQLException ex) {
+            throw new IOException(ex);
+        }
     }
 }
