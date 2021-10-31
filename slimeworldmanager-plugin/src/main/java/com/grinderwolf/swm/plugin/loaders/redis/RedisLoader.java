@@ -87,4 +87,9 @@ public class RedisLoader implements SlimeLoader {
         }
         connection.del(WORLD_DATA_PREFIX + name, WORLD_LOCK_PREFIX + name);
     }
+
+    @Override
+    public boolean renameWorld(String oldWorldName, String newWorldName) {
+        return true;
+    }
 }

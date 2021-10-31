@@ -174,4 +174,9 @@ public class FileLoader implements SlimeLoader {
             }
         }
     }
+
+    @Override
+    public boolean renameWorld(String oldWorldName, String newWorldName) {
+        return true;
+    }
 }

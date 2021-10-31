@@ -84,4 +84,13 @@ public interface SlimeLoader {
      */
     void deleteWorld(String worldName) throws UnknownWorldException, IOException;
 
+    /**
+     * Renames a world in the data source.
+     *
+     * @param oldWorldName current (old) name of the world
+     * @param newWorldName new name of the world
+     *
+     * @throws UnknownWorldException if the world could not be found.
+     */
+    boolean renameWorld(String oldWorldName, String newWorldName) throws UnknownWorldException;
 }

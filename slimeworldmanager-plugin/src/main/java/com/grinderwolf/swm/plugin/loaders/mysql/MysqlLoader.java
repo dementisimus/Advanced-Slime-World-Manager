@@ -289,4 +289,9 @@ public class MysqlLoader extends UpdatableLoader {
             throw new IOException(ex);
         }
     }
+
+    @Override
+    public boolean renameWorld(String oldWorldName, String newWorldName) {
+        return true;
+    }
 }

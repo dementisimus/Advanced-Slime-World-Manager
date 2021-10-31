@@ -23,6 +23,7 @@ import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -284,5 +285,31 @@ public class MongoLoader extends UpdatableLoader {
         } catch (MongoException ex) {
             throw new IOException(ex);
         }
+    }
+
+    @Override
+    public boolean renameWorld(String oldWorldName, String newWorldName) throws UnknownWorldException {
+        if(this.lockedWorlds.containsKey(oldWorldName)) {
+            return false;
+        }
+
+        MongoDatabase mongoDatabase = this.client.getDatabase(this.database);
+        MongoCollection<Document> mongoCollection = mongoDatabase.getCollection(this.collection);
+
+        Bson oldWorldNameFilter = Filters.eq("name", oldWorldName);
+        Document worldDoc = mongoCollection.find(oldWorldNameFilter).first();
+
+        GridFSBucket bucket = GridFSBuckets.create(mongoDatabase, this.collection);
+        GridFSFile file = bucket.find(Filters.eq("filename", oldWorldName)).first();
+
+        if(file == null || worldDoc == null) {
+            throw new UnknownWorldException(oldWorldName);
+        }
+
+        bucket.rename(file.getObjectId(), newWorldName);
+        worldDoc.put("name", newWorldName);
+
+        UpdateResult updateResult = mongoCollection.replaceOne(oldWorldNameFilter, worldDoc);
+        return updateResult.getModifiedCount() != 0;
     }
 }
