@@ -5,7 +5,6 @@ import com.grinderwolf.swm.api.exceptions.WorldInUseException;
 import com.grinderwolf.swm.api.loaders.SlimeLoader;
 import com.grinderwolf.swm.plugin.log.Logging;
 import org.apache.commons.io.FileUtils;
-import org.bukkit.Bukkit;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -13,7 +12,6 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
 import java.nio.channels.OverlappingFileLockException;
 import java.nio.file.NotDirectoryException;
 import java.util.*;
@@ -176,7 +174,15 @@ public class FileLoader implements SlimeLoader {
     }
 
     @Override
-    public boolean renameWorld(String oldWorldName, String newWorldName) {
-        return true;
+    public boolean renameWorld(String oldWorldName, String newWorldName) throws IOException {
+        if(this.isWorldLocked(oldWorldName)) {
+            return false;
+        }
+
+        return this.getWorldDir(oldWorldName).renameTo(this.getWorldDir(newWorldName));
+    }
+
+    private File getWorldDir(String worldName) {
+        return new File(this.worldDir, worldName + ".slime");
     }
 }
