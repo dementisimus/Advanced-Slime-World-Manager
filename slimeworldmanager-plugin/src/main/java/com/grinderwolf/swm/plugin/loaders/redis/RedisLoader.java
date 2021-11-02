@@ -90,6 +90,6 @@ public class RedisLoader implements SlimeLoader {
 
     @Override
     public boolean renameWorld(String oldWorldName, String newWorldName) {
-        return true;
+        throw new UnsupportedOperationException("Redis support for renaming worlds has (yet) not been added.");
     }
 }
